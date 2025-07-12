@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BookOpen, Send, Trash2, Bell, BellOff } from 'lucide-react';
+// ⚠️ Firebase is disabled temporarily
+// import { requestFCMToken, onForegroundMessage } from './firebase';
 import { useChat } from './hooks/useChat';
-import { requestFCMToken, onForegroundMessage } from './firebase';
 import ThoughtCloud from './components/ThoughtCloud';
 import ChatBubble from './components/ChatBubble';
 
@@ -24,44 +25,36 @@ function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [msgs]);
 
-  // Setup FCM when notifications are enabled
-  useEffect(() => {
-    if (currentUser && notificationsOn) {
-      // Check if notification permission is denied
-      if (Notification.permission === 'denied') {
-        setNotificationsOn(false);
-        return;
-      }
+  // 🔒 Temporarily disabling Firebase for GitHub Pages deployment
+  // useEffect(() => {
+  //   if (currentUser && notificationsOn && "Notification" in window) {
+  //     if (Notification.permission === 'denied') {
+  //       setNotificationsOn(false);
+  //       return;
+  //     }
 
-      requestFCMToken().then(token => {
-        if (token) {
-          console.log('FCM token received:', token);
-          // Save token to Firestore for server-side notifications
-        }
-      }).catch(err => {
-        console.error('Error getting FCM token:', err);
-        // If permission is blocked, turn off notifications
-        if (err.code === 'messaging/permission-blocked') {
-          setNotificationsOn(false);
-        }
-      });
+  //     requestFCMToken().then(token => {
+  //       if (token) console.log('FCM token:', token);
+  //     }).catch(err => {
+  //       console.error('FCM error:', err);
+  //       if (err.code === 'messaging/permission-blocked') {
+  //         setNotificationsOn(false);
+  //       }
+  //     });
 
-      // Listen for foreground messages
-      const unsubscribe = onForegroundMessage((payload) => {
-        console.log('Foreground message:', payload);
-        // Handle foreground message display
-      });
+  //     const unsubscribe = onForegroundMessage((payload) => {
+  //       console.log('Foreground message:', payload);
+  //     });
 
-      return unsubscribe;
-    }
-  }, [currentUser, notificationsOn]);
+  //     return unsubscribe;
+  //   }
+  // }, [currentUser, notificationsOn]);
 
   const handleNicknameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const nickname = inputNickname.trim().toLowerCase();
-    
+
     if (nickname === "vishwa" || nickname === "navya") {
-      // Set the proper capitalized version
       const properNickname = nickname === "vishwa" ? "Vishwa" : "Navya";
       setCurrentUser(properNickname as Nickname);
       setAccessDenied(false);
@@ -89,7 +82,6 @@ function App() {
     }
   };
 
-  // Nickname entry screen
   if (!currentUser) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 
@@ -155,7 +147,6 @@ function App() {
     );
   }
 
-  // Main chat interface
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
@@ -200,7 +191,7 @@ function App() {
         </div>
       </div>
 
-      {/* Chat Messages */}
+      {/* Messages */}
       <div className="max-w-2xl mx-auto p-4 pb-24">
         <div className="space-y-4">
           {msgs.length === 0 ? (
@@ -240,7 +231,7 @@ function App() {
         </div>
       </div>
 
-      {/* Message Input */}
+      {/* Input */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm 
                       border-t border-blue-200 p-4">
         <form onSubmit={handleSendMessage} className="max-w-2xl mx-auto">
@@ -291,7 +282,7 @@ function App() {
         </form>
       </div>
 
-      {/* Floating Study Icons Animation */}
+      {/* Decorative Icons */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-20 left-5 text-blue-200 text-2xl animate-bounce 
                         animation-delay-1000">📚</div>
